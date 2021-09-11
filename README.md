@@ -1,6 +1,5 @@
 ## Roguelike Tutorial - In Rust
-* Working repo on my progress on the book: [Hands-on Rust
-  Effective Learning through 2D Game Development and Play](https://pragprog.com/titles/hwrust/hands-on-rust/)
+* Working repo on my progress on the tutorial: https://bfnightly.bracketproductions.com/rustbook/
 
 * Implementations:
   * Chapter 2: [chapter2.rs](src/chapter2.rs)
