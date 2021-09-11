@@ -1,10 +1,8 @@
 use rltk::{GameState, Rltk, RGB};
 use specs::prelude::*;
 use specs::shred::Fetch;
-use crate::chapter4::map::new_map;
+use crate::chapter4::map::new_map_rooms_and_corridors;
 use crate::chapter4::map::TileType;
-use crate::chapter4::map::MAP_SIZE_X;
-use crate::chapter4::map::MAP_SIZE_Y;
 use crate::chapter4::map::draw_map;
 use crate::chapter4::player::player_input;
 use crate::chapter4::components::Player;
@@ -52,9 +50,13 @@ pub fn run() -> rltk::BError {
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<Player>();
 
+    let (rooms, map) = new_map_rooms_and_corridors();
+    gs.ecs.insert(map);
+    let (player_x, player_y) = rooms[0].center();
+
     gs.ecs
         .create_entity()
-        .with(Position { x: MAP_SIZE_X / 2, y: MAP_SIZE_Y / 2 })
+        .with(Position { x: player_x, y: player_y})
         .with(Renderable {
             glyph: rltk::to_cp437('@'),
             foreground: RGB::named(rltk::YELLOW),
@@ -63,6 +65,5 @@ pub fn run() -> rltk::BError {
         .with(Player {})
         .build();
 
-    gs.ecs.insert(new_map());
     rltk::main_loop(context, gs)
 }

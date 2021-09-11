@@ -10,6 +10,7 @@
     * [components.rs](src/chapter4/components.rs) - The components for the ECS
     * [map.rs](src/chapter4/map.rs) - Types and methods for the map/world
     * [player.rs](src/chapter4/player.rs) - Methods for player input
+    * [rect.rs](src/chapter4/rect.rs) - Rectangle type and methods
 
 You must run each chapter independently of the [main.rs](src/main.rs) main method, i.e. add the chapter you wish to run
 ```rust
