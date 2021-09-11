@@ -2,7 +2,6 @@ use rltk::{GameState, Rltk, RGB, VirtualKeyCode};
 use specs::prelude::*;
 use std::cmp::{max, min};
 use specs_derive::Component;
-use std::any::TypeId;
 use specs::shred::Fetch;
 
 static MAP_SIZE_X: i32 = 80;
@@ -158,13 +157,13 @@ fn draw_map(map: &[TileType], context: &mut Rltk) {
         match tile {
             TileType::Floor => {
                 context.set(x, y, RGB::from_f32(0.5, 0.5, 0.5),
-                        RGB::from_f32(0., 0., 0.),
-                        rltk::to_cp437('.'));
+                            RGB::from_f32(0., 0., 0.),
+                            rltk::to_cp437('.'));
             }
             TileType::Wall => {
                 context.set(x, y, RGB::from_f32(0.0, 1.0, 0.0),
-                        RGB::from_f32(0., 0., 0.),
-                      rltk::to_cp437('#'));
+                            RGB::from_f32(0., 0., 0.),
+                            rltk::to_cp437('#'));
             }
         }
 
