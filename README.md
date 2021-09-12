@@ -1,4 +1,6 @@
 ## Roguelike Tutorial - In Rust
+[![Release](https://github.com/FlyingCowMooMoo/rust-game-roguelike/actions/workflows/release.yml/badge.svg)](https://github.com/FlyingCowMooMoo/rust-game-roguelike/actions/workflows/release.yml)
+
 * Working repo on my progress on the tutorial: https://bfnightly.bracketproductions.com/rustbook/
 
 * Implementations:
