@@ -1,13 +1,9 @@
-use crate::chapter4::map::TileType;
 use specs::prelude::*;
-use crate::chapter4::map::xy_index;
-use crate::chapter4::map::MAP_SIZE_X;
-use crate::chapter4::map::MAP_SIZE_Y;
-use crate::chapter4::components::Player;
-use crate::chapter4::components::Position;
-use crate::chapter4::chapter4::State;
 use std::cmp::{max, min};
 use rltk::{Rltk, VirtualKeyCode};
+use crate::components::{Position, Player};
+use crate::map::{TileType, MAP_SIZE_X, MAP_SIZE_Y, xy_index};
+use crate::game::State;
 
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut positions = ecs.write_storage::<Position>();

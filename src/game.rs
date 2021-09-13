@@ -1,13 +1,9 @@
 use rltk::{GameState, Rltk, RGB};
 use specs::prelude::*;
 use specs::shred::Fetch;
-use crate::chapter4::map::new_map_rooms_and_corridors;
-use crate::chapter4::map::TileType;
-use crate::chapter4::map::draw_map;
-use crate::chapter4::player::player_input;
-use crate::chapter4::components::Player;
-use crate::chapter4::components::Position;
-use crate::chapter4::components::Renderable;
+use crate::player::player_input;
+use crate::map::{TileType, draw_map, new_map_rooms_and_corridors};
+use crate::components::{Position, Renderable, Player};
 
 
 pub struct State {

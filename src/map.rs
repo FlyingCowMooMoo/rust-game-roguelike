@@ -1,6 +1,6 @@
 use rltk::{Rltk, RGB, RandomNumberGenerator};
-use crate::chapter4::rect::Rect;
 use std::cmp::{min, max};
+use crate::rect::Rect;
 
 pub static MAP_SIZE_X: i32 = 80;
 pub static MAP_SIZE_Y: i32 = 50;
