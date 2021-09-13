@@ -1,8 +1,7 @@
 use rltk::{GameState, Rltk, RGB};
 use specs::prelude::*;
-use specs::shred::Fetch;
 use crate::player::player_input;
-use crate::map::{TileType, draw_map, new_map_rooms_and_corridors};
+use crate::map::{draw_map, Map};
 use crate::components::{Position, Renderable, Player};
 
 
@@ -23,8 +22,7 @@ impl GameState for State {
         player_input(self, context);
         self.run_systems();
 
-        let map: Fetch<Vec<TileType>> = self.ecs.fetch::<Vec<TileType>>();
-        draw_map(&map, context);
+        draw_map(&self.ecs, context);
 
         let positions = self.ecs.read_storage::<Position>();
         let renderables = self.ecs.read_storage::<Renderable>();
@@ -46,9 +44,9 @@ pub fn run() -> rltk::BError {
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<Player>();
 
-    let (rooms, map) = new_map_rooms_and_corridors();
+    let map = Map::new_map_rooms_and_corridors();
+    let (player_x, player_y) = map.rooms[0].center();
     gs.ecs.insert(map);
-    let (player_x, player_y) = rooms[0].center();
 
     gs.ecs
         .create_entity()

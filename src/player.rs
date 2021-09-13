@@ -2,17 +2,17 @@ use specs::prelude::*;
 use std::cmp::{max, min};
 use rltk::{Rltk, VirtualKeyCode};
 use crate::components::{Position, Player};
-use crate::map::{TileType, MAP_SIZE_X, MAP_SIZE_Y, xy_index};
+use crate::map::{TileType, MAP_SIZE_X, MAP_SIZE_Y, Map};
 use crate::game::State;
 
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut positions = ecs.write_storage::<Position>();
     let mut players = ecs.write_storage::<Player>();
-    let map = ecs.fetch::<Vec<TileType>>();
+    let map = ecs.fetch::<Map>();
 
     for (_player, pos) in (&mut players, &mut positions).join() {
-        let destination_index = xy_index(pos.x + delta_x, pos.y + delta_y);
-        if map[destination_index] != TileType::Wall {
+        let destination_index = map.xy_index(pos.x + delta_x, pos.y + delta_y);
+        if map.tiles[destination_index] != TileType::Wall {
             pos.x = min(MAP_SIZE_X - 1, max(0, pos.x + delta_x));
             pos.y = min(MAP_SIZE_Y - 1, max(0, pos.y + delta_y))
         }
