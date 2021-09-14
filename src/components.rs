@@ -1,6 +1,6 @@
+use rltk::{FontCharType, Point, RGB};
 use specs::prelude::*;
 use specs_derive::*;
-use rltk::{RGB};
 
 #[derive(Component)]
 pub struct Position {
@@ -10,10 +10,17 @@ pub struct Position {
 
 #[derive(Component)]
 pub struct Renderable {
-    pub glyph: rltk::FontCharType,
+    pub glyph: FontCharType,
     pub foreground: RGB,
     pub background: RGB,
 }
 
 #[derive(Component, Debug)]
 pub struct Player {}
+
+#[derive(Component)]
+pub struct Viewshed {
+    pub visible_tiles: Vec<Point>,
+    pub range: i32,
+    pub dirty: bool,
+}
