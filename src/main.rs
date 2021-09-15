@@ -1,8 +1,9 @@
-mod game;
-mod rect;
-mod player;
-mod map;
 mod components;
+mod game;
+mod map;
+mod monster_ai_system;
+mod player;
+mod rect;
 mod visibility_system;
 
 fn main() -> rltk::BError {

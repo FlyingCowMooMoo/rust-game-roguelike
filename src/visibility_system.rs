@@ -33,8 +33,7 @@ impl<'life_time_a> System<'life_time_a> for VisibilitySystem {
                     pos.x >= 0 && pos.x < map.width && pos.y >= 0 && pos.y < map.height
                 });
 
-                let p: Option<&Player> = player.get(entity);
-                if let Some(_) = p {
+                player.get(entity).map(|_| {
                     for it in map.visible_tiles.iter_mut() {
                         *it = false
                     }
@@ -43,7 +42,7 @@ impl<'life_time_a> System<'life_time_a> for VisibilitySystem {
                         map.revealed_tiles[index] = true;
                         map.visible_tiles[index] = true;
                     }
-                }
+                });
             }
         }
     }
