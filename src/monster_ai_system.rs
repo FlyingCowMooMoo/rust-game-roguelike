@@ -1,26 +1,74 @@
-use rltk::{console, field_of_view, Point};
+use rltk::{DistanceAlg, Point};
 use specs::prelude::*;
 
-use crate::components::{Monster, Name, Position, Viewshed};
+use crate::components::{Monster, Position, Viewshed, WantsToMelee};
+use crate::game::RunState;
+use crate::game::RunState::MonsterTurn;
+use crate::map::Map;
 
 pub struct MonsterAI {}
 
 impl<'a> System<'a> for MonsterAI {
+    #[allow(clippy::type_complexity)]
     type SystemData = (
+        WriteExpect<'a, Map>,
         ReadExpect<'a, Point>,
-        ReadStorage<'a, Viewshed>,
+        ReadExpect<'a, Entity>,
+        ReadExpect<'a, RunState>,
+        Entities<'a>,
+        WriteStorage<'a, Viewshed>,
         ReadStorage<'a, Monster>,
-        ReadStorage<'a, Name>,
+        WriteStorage<'a, Position>,
+        WriteStorage<'a, WantsToMelee>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (player_position, viewshed, monster, name) = data;
-        for (viewshed, _, name) in (&viewshed, &monster, &name).join() {
-            if viewshed.visible_tiles.contains(&*player_position) {
-                console::log(&format!(
-                    "{} does whatever a {} does :P",
-                    name.name, name.name
-                ));
+        let (
+            mut map,
+            player_pos,
+            player_entity,
+            runstate,
+            entities,
+            mut viewshed,
+            monster,
+            mut position,
+            mut wants_to_melee,
+        ) = data;
+
+        if *runstate != MonsterTurn {
+            return;
+        }
+
+        for (entity, mut viewshed, _monster, mut pos) in
+            (&entities, &mut viewshed, &monster, &mut position).join()
+        {
+            let distance =
+                DistanceAlg::Pythagoras.distance2d(Point::new(pos.x, pos.y), *player_pos);
+            if distance < 1.5 {
+                wants_to_melee
+                    .insert(
+                        entity,
+                        WantsToMelee {
+                            target: *player_entity,
+                        },
+                    )
+                    .expect("Unable to insert attack");
+            } else if viewshed.visible_tiles.contains(&*player_pos) {
+                // Path to the player
+                let path = rltk::a_star_search(
+                    map.xy_index(pos.x, pos.y),
+                    map.xy_index(player_pos.x, player_pos.y),
+                    &mut *map,
+                );
+                if path.success && path.steps.len() > 1 {
+                    let mut idx = map.xy_index(pos.x, pos.y);
+                    map.blocked[idx] = false;
+                    pos.x = path.steps[1] as i32 % map.width;
+                    pos.y = path.steps[1] as i32 / map.width;
+                    idx = map.xy_index(pos.x, pos.y);
+                    map.blocked[idx] = true;
+                    viewshed.dirty = true;
+                }
             }
         }
     }

@@ -1,8 +1,8 @@
 use std::cmp::{max, min};
 
-use rltk::{Algorithm2D, BaseMap, Point, RandomNumberGenerator, Rltk, RGB};
+use rltk::{Algorithm2D, BaseMap, DistanceAlg, Point, RandomNumberGenerator, Rltk, SmallVec, RGB};
 use specs::shred::Fetch;
-use specs::World;
+use specs::{Entity, World};
 
 use crate::rect::Rect;
 
@@ -22,6 +22,8 @@ pub struct Map {
     pub height: i32,
     pub revealed_tiles: Vec<bool>,
     pub visible_tiles: Vec<bool>,
+    pub blocked: Vec<bool>,
+    pub tile_content: Vec<Vec<Entity>>,
 }
 
 impl Algorithm2D for Map {
@@ -32,7 +34,50 @@ impl Algorithm2D for Map {
 
 impl BaseMap for Map {
     fn is_opaque(&self, index: usize) -> bool {
-        self.tiles[index as usize] == TileType::Wall
+        self.tiles[index] == TileType::Wall
+    }
+
+    fn get_available_exits(&self, index: usize) -> SmallVec<[(usize, f32); 10]> {
+        let mut exits = SmallVec::new();
+        let x = index as i32 % self.width;
+        let y = index as i32 / self.width;
+        let width = self.width as usize;
+
+        if self.is_exit_valid(x - 1, y) {
+            exits.push((index - 1, 1.0))
+        };
+        if self.is_exit_valid(x + 1, y) {
+            exits.push((index + 1, 1.0))
+        };
+        if self.is_exit_valid(x, y - 1) {
+            exits.push((index - width, 1.0))
+        };
+        if self.is_exit_valid(x, y + 1) {
+            exits.push((index + width, 1.0))
+        };
+
+        // Diagonal below
+        if self.is_exit_valid(x - 1, y - 1) {
+            exits.push(((index - width) - 1, 1.45));
+        }
+        if self.is_exit_valid(x + 1, y - 1) {
+            exits.push(((index - width) + 1, 1.45));
+        }
+        if self.is_exit_valid(x - 1, y + 1) {
+            exits.push(((index + width) - 1, 1.45));
+        }
+        if self.is_exit_valid(x + 1, y + 1) {
+            exits.push(((index + width) + 1, 1.45));
+        }
+
+        exits
+    }
+
+    fn get_pathing_distance(&self, index1: usize, index2: usize) -> f32 {
+        let width = self.width as usize;
+        let point1 = Point::new(index1 % width, index1 / width);
+        let point2 = Point::new(index2 % width, index2 / width);
+        DistanceAlg::Pythagoras.distance2d(point1, point2)
     }
 }
 
@@ -76,6 +121,8 @@ impl Map {
             height: MAP_SIZE_Y,
             revealed_tiles: vec![false; (MAP_SIZE_X * MAP_SIZE_Y) as usize],
             visible_tiles: vec![false; (MAP_SIZE_X * MAP_SIZE_Y) as usize],
+            blocked: vec![false; (MAP_SIZE_X * MAP_SIZE_Y) as usize],
+            tile_content: vec![Vec::new(); (MAP_SIZE_X * MAP_SIZE_Y) as usize],
         };
 
         const MAX_ROOMS: i32 = 30;
@@ -115,6 +162,26 @@ impl Map {
             }
         }
         map
+    }
+
+    fn is_exit_valid(&self, x: i32, y: i32) -> bool {
+        if x < 1 || x > self.width - 1 || y < 1 || y > self.height - 1 {
+            return false;
+        }
+        let index = self.xy_index(x, y);
+        !self.blocked[index]
+    }
+
+    pub fn populate_blocked(&mut self) {
+        for (i, tile) in self.tiles.iter_mut().enumerate() {
+            self.blocked[i] = *tile == TileType::Wall;
+        }
+    }
+
+    pub fn clear_content_index(&mut self) {
+        for content in self.tile_content.iter_mut() {
+            content.clear();
+        }
     }
 }
 
